@@ -13,3 +13,79 @@ datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+model User {
+  id           String    @id @default(uuid())
+  email        String    @unique
+  passwordHash String
+  name         String?
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  wallets      Wallet[]
+  categories   Category[]
+  transactions Transaction[]
+}
+
+model Wallet {
+  id        String   @id @default(uuid())
+  name      String
+  balance   Decimal  @default(0)
+  currency  String   @default("RUB")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  transactions Transaction[]
+
+  @@index([userId])
+}
+
+model Category {
+  id        String   @id @default(uuid())
+  name      String
+  type      CategoryType
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  parentId   String?
+  parent     Category? @relation("CategoryToChildren", fields: [parentId], references: [id], onDelete: Cascade)
+  children   Category[] @relation("CategoryToChildren")
+
+  transactions Transaction[]
+
+  @@index([userId])
+  @@index([type])
+}
+
+model Transaction {
+  id          String   @id @default(uuid())
+  amount      Decimal
+  type        CategoryType
+  date        DateTime @default(now())
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId     String
+  categoryId String
+  walletId   String
+
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  wallet   Wallet   @relation(fields: [walletId], references: [id], onDelete: Restrict)
+
+  @@index([userId])
+  @@index([date])
+  @@index([userId, date])
+}
+
+enum CategoryType {
+  INCOME
+  EXPENSE
+}
