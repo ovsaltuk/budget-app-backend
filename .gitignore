@@ -17,3 +17,5 @@ yarn-error.log*
 Thumbs.db
 prisma/generated/
 generated/
+
+/src/generated/prisma
