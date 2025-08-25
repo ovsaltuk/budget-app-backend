@@ -1,0 +1,36 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement()) // Уникальный ID, автоинкремент
+  email     String   @unique // Email, должен быть уникальным
+  login     String   @unique // Логин, должен быть уникальным  
+  password  String   // Хэшированный пароль
+  createdAt DateTime @default(now()) // Дата создания, по умолчанию сейчас
+  updatedAt DateTime @updatedAt // Дата обновления, автоматически обновляется
+
+  // Связь "один ко многим": один User имеет много Transaction
+  transactions Transaction[]
+}
+
+model Transaction {
+  id          Int       @id @default(autoincrement()) // Уникальный ID
+  type        String    // "income" (доход) или "expense" (расход)
+  amount      Float     // Сумма операции
+  date        DateTime  // Дата операции
+  category    String    // Категория (например, "Еда", "Транспорт")
+  subcategory String?   // Подкатегория (например, "Рестораны"), может быть пустой
+  description String?   // Описание, может быть пустым
+  createdAt   DateTime  @default(now()) // Дата создания записи
+  updatedAt   DateTime  @updatedAt // Дата обновления записи
+
+  // Связь "многие к одному": много Transaction принадлежат одному User
+  user   User @relation(fields: [userId], references: [id])
+  userId Int  // ID пользователя (внешний ключ)
+}
