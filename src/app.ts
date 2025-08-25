@@ -5,6 +5,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 // Добавь этот импорт после остальных импортов
 import authRoutes from './routes/auth';
+import transactionRoutes from './routes/transactions';
 
 // Создаем экземпляр Express-приложения
 const app = express();
@@ -21,6 +22,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes); 
+app.use('/api/transactions', transactionRoutes);
 
 // Пока что создадим простой тестовый маршрут
 app.get('/api/health', (req, res) => {

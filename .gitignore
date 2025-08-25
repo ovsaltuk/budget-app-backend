@@ -19,3 +19,5 @@ prisma/generated/
 generated/
 
 /src/generated/prisma
+
+package-lock.json
