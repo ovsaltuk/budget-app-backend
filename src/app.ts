@@ -22,7 +22,7 @@ app.use(express.json());
 
 // Routes
 app.use('/api/auth', authRoutes); 
-app.use('/api/transactions', transactionRoutes); // Добавь эту строку
+app.use('/api/transactions', transactionRoutes);
 
 // Пока что создадим простой тестовый маршрут
 app.get('/api/health', (req, res) => {
