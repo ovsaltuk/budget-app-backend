@@ -3,6 +3,8 @@ import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import morgan from 'morgan';
+// Добавь этот импорт после остальных импортов
+import authRoutes from './routes/auth';
 
 // Создаем экземпляр Express-приложения
 const app = express();
@@ -16,6 +18,9 @@ app.use(cors());
 app.use(morgan('combined'));
 // Подключаем встроенное middleware Express для парсинга JSON из тела запроса
 app.use(express.json());
+
+// Routes
+app.use('/api/auth', authRoutes); 
 
 // Пока что создадим простой тестовый маршрут
 app.get('/api/health', (req, res) => {
