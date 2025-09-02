@@ -6,6 +6,7 @@ import {
   createTransaction,
   updateTransaction,
   deleteTransaction,
+  createTransactions,
 } from '../controllers/transactionController';
 // Импортируем middleware для проверки аутентификации
 import { authMiddleware } from '../middleware/auth';
@@ -25,6 +26,9 @@ router.get('/:id', getTransaction);
 
 // POST /api/transactions - создать новую транзакцию
 router.post('/', createTransaction);
+
+// POST /api/transactions/bulk - создать несколько новых транзакций
+router.post('/bulk', createTransactions); 
 
 // PUT /api/transactions/:id - обновить существующую транзакцию
 router.put('/:id', updateTransaction);

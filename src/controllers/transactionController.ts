@@ -151,3 +151,37 @@ export const deleteTransaction = async (req: AuthRequest, res: Response): Promis
     res.status(500).json({ message: 'Failed to delete transaction' });
   }
 };
+
+// Массовое создание транзакций
+export const createTransactions = async (req: AuthRequest, res: Response): Promise<void> => {
+  const transactionsData = req.body;
+
+  try {
+    // Валидация: проверяем что это массив
+    if (!Array.isArray(transactionsData)) {
+      res.status(400).json({ message: 'Expected array of transactions' });
+      return;
+    }
+
+    const createdTransactions = await prisma.$transaction(
+      transactionsData.map(transactionData => 
+        prisma.transaction.create({
+          data: {
+            type: transactionData.type,
+            amount: parseFloat(transactionData.amount),
+            date: new Date(transactionData.date),
+            category: transactionData.category,
+            subcategory: transactionData.subcategory,
+            description: transactionData.description,
+            user: { connect: { id: req.user.userId } }
+          }
+        })
+      )
+    );
+
+    res.status(201).json(createdTransactions);
+  } catch (error) {
+    console.error('Create transactions error:', error);
+    res.status(500).json({ message: 'Failed to create transactions' });
+  }
+};
