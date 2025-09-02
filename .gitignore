@@ -21,3 +21,4 @@ generated/
 /src/generated/prisma
 
 package-lock.json
+/prisma/dev.db
