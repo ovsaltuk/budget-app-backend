@@ -152,6 +152,62 @@ export const deleteTransaction = async (req: AuthRequest, res: Response): Promis
   }
 };
 
+// Массовое удаление транзакций
+export const deleteTransactions = async (req: AuthRequest, res: Response): Promise<void> => {
+  const { ids } = req.body;
+
+  try {
+    // Валидация: проверяем что ids является массивом
+    if (!Array.isArray(ids)) {
+      res.status(400).json({ message: 'Expected array of transaction IDs' });
+      return;
+    }
+
+    // Преобразуем все ID в числа и фильтруем невалидные
+    const transactionIds = ids
+      .map(id => typeof id === 'string' ? parseInt(id) : id)
+      .filter(id => typeof id === 'number' && !isNaN(id) && id > 0);
+    
+    if (transactionIds.length === 0) {
+      res.status(400).json({ message: 'No valid transaction IDs provided' });
+      return;
+    }
+
+    console.log('Attempting to delete transaction IDs:', transactionIds);
+
+    // Удаляем транзакции только принадлежащие текущему пользователю
+    const deleteResult = await prisma.transaction.deleteMany({
+      where: {
+        id: {
+          in: transactionIds
+        },
+        userId: req.user.userId // Важно: удаляем только свои транзакции
+      }
+    });
+
+    console.log('Delete result:', deleteResult);
+
+    res.json({
+      message: `Successfully deleted ${deleteResult.count} transactions`,
+      deletedCount: deleteResult.count
+    });
+  } catch (error: any) {
+    console.error('Delete transactions error:', error);
+    
+    // Более детальная обработка ошибок
+    if (error instanceof Error) {
+      console.error('Error name:', error.name);
+      console.error('Error message:', error.message);
+      console.error('Error stack:', error.stack);
+    }
+    
+    res.status(500).json({ 
+      message: 'Failed to delete transactions',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
+    });
+  }
+};
+
 // Массовое создание транзакций
 export const createTransactions = async (req: AuthRequest, res: Response): Promise<void> => {
   const transactionsData = req.body;
