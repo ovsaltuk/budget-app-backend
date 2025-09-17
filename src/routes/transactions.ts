@@ -7,6 +7,7 @@ import {
   updateTransaction,
   deleteTransaction,
   createTransactions,
+  deleteTransactions,
 } from '../controllers/transactionController';
 // Импортируем middleware для проверки аутентификации
 import { authMiddleware } from '../middleware/auth';
@@ -32,6 +33,9 @@ router.post('/bulk', createTransactions);
 
 // PUT /api/transactions/:id - обновить существующую транзакцию
 router.put('/:id', updateTransaction);
+
+// DELETE /api/transactions
+router.post('/delete-multiple', deleteTransactions); // МАССОВОЕ УДАЛЕНИЕ
 
 // DELETE /api/transactions/:id - удалить транзакцию
 router.delete('/:id', deleteTransaction);
